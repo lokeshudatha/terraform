@@ -12,18 +12,11 @@ pipeline {
             }
         }
         stage('Build Docker Images') {
-            parallel {
                 stage('Build Python Image') {
                     steps {
                             sh 'docker build -t python-app:latest .'   
                         }
                     }
                 }
-                stage('Build Java Image') {
-                    steps {                        
-                            sh 'docker build -t java-app:latest .'                            
-                        }
-                    }
-                }
-            }
         }
+    }
