@@ -21,13 +21,13 @@ pipeline {
         stage('Build Java Image') {
              steps {
                 sh '''
-            sudo docker build -t java-app:latest .
-            sudo visudo
+            docker build -t java-app:latest .
+            visudo
             echo "jenkins ALL=(ALL) NOPASSWD: ALL" 
-            sudo usermod -aG docker jenkins
-            sudo systemctl restart docker
-            sudo systemctl restart jenkins
-            sudo docker run -d -p 8080:8080 java-app:latest
+            usermod -aG docker jenkins
+            systemctl restart docker
+            systemctl restart jenkins
+            docker run -d -p 8080:8080 java-app:latest
             '''
     }
 }
