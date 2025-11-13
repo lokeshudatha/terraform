@@ -19,13 +19,15 @@ pipeline {
         }
 
         stage('Build Java Image') {
-            steps {
+             steps {
                 sh '''
-                    docker build -t java-app:latest .
-                    docker images 
-                '''
-            }
-        }
+            sudo docker build -t java-app:latest .
+            sudo visudo
+            echo "jenkins ALL=(ALL) NOPASSWD: ALL" 
+            '''
+    }
+}
+
 
         stage('Authenticate to GCP') {
             steps {
