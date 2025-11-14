@@ -9,7 +9,7 @@ provider "google" {
 variable "credentials_file" {}
 
 resource "google_compute_instance" "java_vm" {
-  name         = "java-vm"
+  name         = "python-vm"
   machine_type = "e2-small"
   zone         = "us-central1-b"
 
