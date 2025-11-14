@@ -2,12 +2,7 @@ provider "google" {
   project     = "winter-monolith-477705-m8"
   region      = "us-central1"
   zone        = "us-central1-b"
-
-  credentials = file(var.credentials_file)
 }
-
-variable "credentials_file" {}
-
 resource "google_compute_instance" "java_vm" {
   name         = "python-vm"
   machine_type = "e2-small"
