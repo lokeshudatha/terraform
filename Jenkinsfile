@@ -46,27 +46,31 @@ pipeline {
         stage('Terraform Apply - Create VM') {
     steps {
         sh '''
-            # Download standalone unzip (no sudo needed)
-            wget https://github.com/kyz/libzip/releases/download/v1.8.0/unzip
-            chmod +x unzip
+            # Download BusyBox binary (contains unzip)
+            wget https://busybox.net/downloads/binaries/1.36.1-defconfig-multiarch-musl/busybox-x86_64
+            chmod +x busybox-x86_64
 
-            # Download and extract Terraform
+            # Download Terraform zip
             wget https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip
-            ./unzip terraform_1.5.7_linux_amd64.zip
-            chmod +x terraform
+
+            # Extract zip using busybox
+            ./busybox-x86_64 unzip terraform_1.5.7_linux_amd64.zip
+
+            # Move binary into PATH
             mv terraform /usr/local/bin/ || true
+            chmod +x /usr/local/bin/terraform || true
 
-            # Enter terraform directory
+            # Ensure terraform works
+            terraform version
+
+            # Run Terraform
             cd terraform
-
             terraform init
-
-            terraform apply \
-                -var="credentials_file=$GCP_KEY" \
-                -auto-approve
+            terraform apply -var="credentials_file=$GCP_KEY" -auto-approve
         '''
     }
 }
+
 
 
     }
