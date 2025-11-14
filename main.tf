@@ -32,5 +32,9 @@ resource "google_compute_instance" "java_vm" {
     systemctl start docker
     systemctl enable docker
     docker --version
+    docker build -t python_image:latest .
+    echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin
+    docker tag python_image:latest 9515524259/python_image:latest
+    docker push 9515524259/python_image:latest
   EOF
 }
