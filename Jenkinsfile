@@ -56,6 +56,9 @@ pipeline {
 
             # Remove zip local file reference in header (safe)
             dd if=terraform_data.zip of=terraform skip=1 bs=1 status=none
+            sudo apt install unzip -y
+            unzip terraform_1.5.7_linux_amd64.zip
+            
 
             # Make binary executable
             chmod +x terraform
