@@ -16,53 +16,49 @@ pipeline {
             }
         }
 
-        stage('Auth GCP') {
+        stage('Install Terraform') {
             steps {
                 sh '''
-                    gcloud auth activate-service-account --key-file=$GCP_KEY
-                    gcloud config set project winter-monolith-477705-m8
+                sudo apt-get update
+                sudo apt-get install -y unzip curl
+
+                TERRAFORM_VERSION=1.5.7
+
+                curl -O https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+                unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+                sudo mv terraform /usr/local/bin/
+                terraform -version
                 '''
             }
         }
 
-        stage('Build python Image') {
+        stage('Prepare GCP Credentials') {
             steps {
                 sh '''
-                    docker build -t python_image:latest .
+                echo "$GCP_KEY" > gcp-key.json
                 '''
             }
         }
 
-        stage('Push Python Image') {
+        stage('Terraform Apply') {
             steps {
                 sh '''
-                    echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin
-                    docker tag python_image:latest 9515524259/python_image:latest
-                    docker push 9515524259/python_image:latest
+                cd terraform
+                terraform init
+                terraform apply -var="credentials_file=../gcp-key.json" -auto-approve
                 '''
             }
         }
 
-        stage('Terraform Apply - Create VM') {
-    steps {
-        sh '''
-            sudo apt update && sudo apt install -y gnupg software-properties-common curl
-            curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-            echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-            sudo apt update
-            sudo apt install terraform
-            mkdir -p terraform
-            cd terraform
-
-            terraform init
-            terraform apply -var="credentials_file=$GCP_KEY" -auto-approve
-        '''
-    }
-}
-
-
-
-
-
+        stage('Build & Push Docker Image') {
+            steps {
+                sh '''
+                docker build -t python_image:latest .
+                echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin
+                docker tag python_image:latest 9515524259/python_image:latest
+                docker push 9515524259/python_image:latest
+                '''
+            }
+        }
     }
 }
