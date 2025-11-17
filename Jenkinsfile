@@ -34,9 +34,8 @@ pipeline {
         stage('Terraform Apply - Create VM') {
             steps {
                 sh '''
-                cd terraform/terraform
+                ls -R .
                 terraform init
-                
                 '''
             }
         }
