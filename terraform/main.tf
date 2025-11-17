@@ -3,8 +3,8 @@ provider "google" {
   region      = "us-central1"
   zone        = "us-central1-b"
 }
-resource "google_compute_instance" "java_vm" {
-  name         = "python-vm"
+resource "google_compute_instance" "python" {
+  name         = "pythonvm"
   machine_type = "e2-small"
   zone         = "us-central1-b"
 
@@ -21,9 +21,12 @@ resource "google_compute_instance" "java_vm" {
 
   metadata_startup_script = <<-EOF
     #!/bin/bash
-    apt-get update
-    apt-get install -y docker.io
-    systemctl start docker
-    systemctl enable docker
+    sudo apt-get update
+    sudo apt-get install -y docker.io
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    sudo usermod -aG docker udathalokesh11
+    sudo chmod 666 /var/run/docker.sock
+    sudo systemctl restart docker
   EOF
 }
