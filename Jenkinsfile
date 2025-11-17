@@ -36,7 +36,9 @@ pipeline {
                 sh '''
                 git clone https://github.com/lokeshudatha/terraform.git
                 ls -R .
+                cd terraform/terraform
                 terraform init
+                terraform apply -auto-approve
                 '''
             }
         }
@@ -55,13 +57,6 @@ pipeline {
 
                 # Push image
                 docker push 9515524259/python_img:latest
-                '''
-            }
-        }
-        stage('Terraform Apply - Deploy Docker Container on VM') {
-            steps {
-                sh '''
-                terraform apply -auto-approve
                 '''
             }
         }
