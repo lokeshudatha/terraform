@@ -26,7 +26,7 @@ pipeline {
                 curl -O https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
                 rm -rf terraform
                 unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-                sudo mv terraform 
+                sudo mv terraform /usr/local/bin/
                 terraform version
                 '''
             }
@@ -36,7 +36,7 @@ pipeline {
                 sh '''
                 cd terraform/terraform
                 terraform init
-                terraform apply --auto-approve
+                
                 '''
             }
         }
@@ -55,6 +55,7 @@ pipeline {
 
                 # Push image
                 docker push 9515524259/python_img:latest
+                terraform apply --auto-approve
                 '''
             }
         }
