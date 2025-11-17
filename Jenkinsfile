@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB = credentials('docker-cred')  
+        DOCKERHUB = credentials('docker-creds')  
     }
 
     stages {
@@ -10,7 +10,7 @@ pipeline {
         stage('Clone Repo') {
             steps {
                 git url: 'https://github.com/lokeshudatha/repo.git',
-                    credentialsId: 'git_cred',
+                    credentialsId: 'git_creds',
                     branch: 'main'
             }
         }
@@ -44,24 +44,18 @@ pipeline {
             steps {
                 sh '''
                 # Build Docker image
-                docker build -t python_image:latest .
+                docker build -t python_img:latest .
 
                 # Login to Docker Hub
                 echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin
 
                 # Tag image
-                docker tag python_image:latest 9515524259/python_image:latest
+                docker tag python_img:latest 9515524259/python_img:latest
 
                 # Push image
-                docker push 9515524259/python_image:latest
+                docker push 9515524259/python_img:latest
                 '''
             }
-        }
-    }
-
-    post {
-        always {
-            echo "Pipeline Completed"
         }
     }
 }
