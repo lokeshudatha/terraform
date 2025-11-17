@@ -1,32 +1,62 @@
-provider "google" {
-  project     = "winter-monolith-477705-m8"
-  region      = "us-central1"
-  zone        = "us-central1-b"
-}
-resource "google_compute_instance" "python" {
-  name         = "pythonvm"
-  machine_type = "e2-small"
-  zone         = "us-central1-b"
+pipeline {
+    agent any
 
-  boot_disk {
-    initialize_params {
-      image = "debian-cloud/debian-11"
+    environment {
+        DOCKERHUB = credentials('docker-creds')  
     }
-  }
 
-  network_interface {
-    network = "default"
-    access_config {}
-  }
+    stages {
 
-  metadata_startup_script = <<-EOF
-    #!/bin/bash
-    sudo apt-get update
-    sudo apt-get install -y docker.io
-    sudo systemctl start docker
-    sudo systemctl enable docker
-    sudo usermod -aG docker udathalokesh11
-    sudo chmod 666 /var/run/docker.sock
-    sudo systemctl restart docker
-  EOF
+        stage('Clone Repo') {
+            steps {
+                git url: 'https://github.com/lokeshudatha/repo.git',
+                    credentialsId: 'git_creds',
+                    branch: 'main'
+            }
+        }
+
+        stage('Install Terraform') {
+            steps {
+                sh '''
+                sudo apt-get update -y
+                sudo apt-get install -y unzip curl gnupg software-properties-common
+
+                TERRAFORM_VERSION=1.5.7
+
+                curl -O https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+                rm -rf terraform
+                unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+                sudo mv terraform /usr/local/bin/
+                terraform version
+                '''
+            }
+        }
+        stage('Terraform Apply - Create VM') {
+            steps {
+                sh '''
+                cd terraform/terraform
+                terraform init
+                terraform apply --auto-approve
+                '''
+            }
+        }
+
+        stage('Build & Push Docker Image') {
+            steps {
+                sh '''
+                # Build Docker image
+                docker build -t python_img:latest .
+
+                # Login to Docker Hub
+                echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin
+
+                # Tag image
+                docker tag python_img:latest 9515524259/python_img:latest
+
+                # Push image
+                docker push 9515524259/python_img:latest
+                '''
+            }
+        }
+    }
 }
