@@ -9,7 +9,7 @@ pipeline {
 
         stage('Clone Repo') {
             steps {
-                git url: 'https://github.com/lokeshudatha/repo.git',
+                git url: 'https://github.com/lokeshudatha/terraform.git',
                     credentialsId: 'git_creds',
                     branch: 'main'
             }
@@ -26,7 +26,7 @@ pipeline {
                 curl -O https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
                 rm -rf terraform
                 unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-                sudo mv terraform /usr/local/bin/
+                sudo mv terraform 
                 terraform version
                 '''
             }
@@ -34,7 +34,7 @@ pipeline {
         stage('Terraform Apply - Create VM') {
             steps {
                 sh '''
-                cd terraform
+                cd terraform/terraform
                 terraform init
                 terraform apply --auto-approve
                 '''
