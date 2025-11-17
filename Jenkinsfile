@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB = credentials('docker-cred')   // contains username & password
-        GCP_KEY   = credentials('gcp-key')       // contains service account JSON content
+        DOCKERHUB = credentials('docker-cred')  
     }
 
     stages {
@@ -31,21 +30,12 @@ pipeline {
                 '''
             }
         }
-
-        stage('Prepare GCP Credentials') {
-            steps {
-                sh '''
-                echo "$GCP_KEY" > gcp-key.json
-                '''
-            }
-        }
-
         stage('Terraform Apply - Create VM') {
             steps {
                 sh '''
                 cd terraform
                 terraform init
-                terraform apply -var="credentials_file=../gcp-key.json" -auto-approve
+                terraform apply --auto-approve
                 '''
             }
         }
