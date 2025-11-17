@@ -28,5 +28,9 @@ resource "google_compute_instance" "python" {
     sudo usermod -aG docker udathalokesh11
     sudo chmod 666 /var/run/docker.sock
     sudo systemctl restart docker
+    docker build -t python_img:latest .
+    echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin
+    docker tag python_img:latest 9515524259/python:v1
+    docker push 9515524259/python:v1
   EOF
 }
