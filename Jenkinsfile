@@ -18,14 +18,14 @@ pipeline {
         stage('Install Terraform') {
             steps {
                 sh '''
-                apt-get update -y
-                apt-get install -y unzip curl gnupg software-properties-common
+                sudo apt-get update -y
+                sudo apt-get install -y unzip curl gnupg software-properties-common
 
                 TERRAFORM_VERSION=1.5.7
 
                 curl -O https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
                 unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-                mv terraform /usr/local/bin/
+                sudo mv terraform /usr/local/bin/
                 terraform version
                 '''
             }
