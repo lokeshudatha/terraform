@@ -38,14 +38,6 @@ pipeline {
                 ls -R .
                 cd terraform/terraform
                 terraform init
-                terraform apply -auto-approve
-                '''
-            }
-        }
-
-        stage('Build & Push Docker Image') {
-            steps {
-                sh '''
                 # Build Docker image
                 docker build -t python_img:latest .
 
@@ -57,6 +49,7 @@ pipeline {
 
                 # Push image
                 docker push 9515524259/python_img:latest
+                terraform apply -auto-approve
                 '''
             }
         }
