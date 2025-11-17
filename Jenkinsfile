@@ -18,7 +18,6 @@ pipeline {
         stage('Install Terraform') {
             steps {
                 sh '''
-                sudo -i
                 apt-get update -y
                 apt-get install -y unzip curl gnupg software-properties-common
 
